@@ -1,66 +1,19 @@
-## Foundry
+# Partial Pauseable
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Partial Pauseable is a diamond-supported contract providing pauseable utilities.
 
-Foundry consists of:
+## Rationale
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+Each facet is defined a MASK_ID that specifies the bits to be manipulated. The actions of 'Pause' and 'Unpause' involve setting or clearing these bits to respectively halt or resume the functionalities.
 
-## Documentation
+![rationale](image.png)
 
-https://book.getfoundry.sh/
+## Slot
 
-## Usage
+- packing two fields into a single slot:
+  - registry: Register a `MASK` to indicate that some of the bits in `STATE` have already been used.
+  - state: Record the state of the bits.
 
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+| registry | state   |
+| -------- | ------- |
+| uint128  | uint128 |
