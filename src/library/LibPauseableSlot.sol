@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import {IPartialPauseable} from "../interface/IPartialPauseable.sol";
+
 library LibPauseableSlot {
     uint256 private constant REGISTRY_MASK = 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000;
     uint256 private constant STATE_MASK = 0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff;
@@ -18,12 +20,18 @@ library LibPauseableSlot {
      * stateful functions
      */
     function _init(PauseableSlot storage slot, uint128 mask) internal {
-        require(mask != uint128(0), "invalid mask value");
-        uint256 registryValue = slot.value & REGISTRY_MASK;
+        if (mask == uint128(0)) {
+            revert IPartialPauseable.Registry_InvalidValue();
+        }
+        uint256 cacheValue = slot.value;
+        uint256 registry = cacheValue & REGISTRY_MASK;
         uint256 maskValue = uint256(mask) << 128;
-        require(registryValue & maskValue == uint256(0), "bit is used");
-        registryValue |= maskValue;
-        slot.value |= registryValue;
+
+        if (registry & maskValue != uint256(0)) {
+            revert IPartialPauseable.Registry_AlreadyInUsed(mask);
+        }
+        registry |= maskValue;
+        slot.value = registry;
     }
 
     function _set(PauseableSlot storage slot, uint128 mask) internal {

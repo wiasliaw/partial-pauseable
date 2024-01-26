@@ -4,6 +4,12 @@ pragma solidity ^0.8.13;
 /// @title IPartialPauseable
 /// @author wiasliaw
 interface IPartialPauseable {
+    /// @dev The operation failed because of invalid value to register.
+    error Registry_InvalidValue();
+
+    /// @dev The operation failed because some of the bits are already in used.
+    error Registry_AlreadyInUsed(uint128);
+
     /// @dev The operation failed because the contract is paused.
     error EnforcedPause();
 
